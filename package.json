@@ -1,0 +1,26 @@
+{
+  "name": "import-analyzer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "import-analyzer": "bin/index.js"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "Nick Hu <nickmanda@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^27.5.1"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.17.3",
+    "ast-types": "^0.14.2",
+    "csv-writer": "^1.6.0",
+    "gitignore-globs": "^0.1.1",
+    "glob": "^7.2.0",
+    "yargs": "^17.3.1"
+  }
+}
