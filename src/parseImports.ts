@@ -1,7 +1,17 @@
 import {parse} from '@babel/parser';
 import {visit} from 'ast-types';
 
-const parseImports = (code: string, ignoreImport?: string) => {
+interface ImportInfo {
+  default: boolean;
+  imports: string[];
+}
+
+export type ImportInfoMap = Record<string, ImportInfo>;
+
+const parseImports = (
+  code: string,
+  importIgnoreRegExp?: string
+): ImportInfoMap | null => {
   let ast = null;
   try {
     ast = parse(code, {
@@ -16,36 +26,38 @@ const parseImports = (code: string, ignoreImport?: string) => {
     return null;
   }
 
-  const ignoreImportRegex = ignoreImport ? new RegExp(ignoreImport) : null;
+  const ignoreImportRegex = importIgnoreRegExp
+    ? new RegExp(importIgnoreRegExp)
+    : null;
 
-  const importsData = {};
+  const importInfo: ImportInfoMap = {};
 
   visit(ast.program.body, {
     visitImportDeclaration(path) {
-      const source = path.node.source.value;
+      const source = path.node.source.value as string;
 
       if (ignoreImportRegex?.test(source)) {
         return false;
       }
 
-      importsData[source] = {default: false, imports: []};
+      importInfo[source] = {default: false, imports: []};
 
       if (path.node.specifiers.length === 0) {
-        importsData[source].default = true;
+        importInfo[source].default = true;
       }
 
       path.node.specifiers.forEach((specifier) => {
         if (specifier.type === 'ImportDefaultSpecifier') {
-          importsData[source].default = true;
+          importInfo[source].default = true;
         } else {
-          importsData[source].imports.push(specifier.imported?.name);
+          importInfo[source].imports.push(specifier.imported?.name);
         }
       });
       this.traverse(path);
     },
   });
 
-  return importsData;
+  return importInfo;
 };
 
 export default parseImports;
