@@ -1,6 +1,6 @@
 {
   "name": "import-analyzer",
-  "version": "1.0.0",
+  "version": "0.8.0",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -13,6 +13,8 @@
   "author": "Nick Hu <nickmanda@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.21.2",
+    "@types/jest": "^29.5.1",
     "jest": "^27.5.1"
   },
   "dependencies": {
