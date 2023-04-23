@@ -2,15 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
 const parseIgnore = require('gitignore-globs');
-const {parse} = require('@babel/parser');
-const {visit} = require('ast-types');
 
 const importAnalyzer = (scanPath, {ignoreImport = null}) => {
   const gitIgnore = parseIgnore('/Users/sh506o/shared/notif-ui/.gitignore');
 
   // TODO: support ignore patterns
-  const filenames = glob.sync(
-    '/Users/sh506o/shared/notif-ui/src/batch/**/*.{js,jsx,ts,tsx}',
+  const filepaths = glob.sync(
+    '/Users/sh506o/shared/notif-ui/src/graymatter/**/*.{js,jsx,ts,tsx}',
     {
       // root: path.resolve(process.cwd(), scanPath),
       // root: '/Users/sh506o/shared/notif-ui',
@@ -18,14 +16,14 @@ const importAnalyzer = (scanPath, {ignoreImport = null}) => {
     }
   );
   /* console.log(
-    '🚀 ~ file: index.js ~ line 10 ~ importAnalyzer ~ filenames',
+    '🚀 ~ file: index.js ~ line 10 ~ importAnalyzer ~ filepaths',
     path.resolve(process.cwd(), scanPath),
-    filenames
+    filepaths
   );
   return; */
 
   const result = {};
-  filenames.forEach((file) => {
+  filepaths.forEach((file) => {
     const data = fs.readFileSync(path.resolve(process.cwd(), file), 'utf8');
     addImports(result, parseImports(data, ignoreImport));
   });
@@ -59,49 +57,6 @@ const importAnalyzer = (scanPath, {ignoreImport = null}) => {
     .then(() => console.log('The CSV file was written successfully'));
 
   return result;
-};
-
-const parseImports = (code, ignoreImport) => {
-  let ast = null;
-  try {
-    ast = parse(code, {
-      sourceType: 'module',
-      plugins: ['jsx', 'typescript'],
-    });
-  } catch (e) {
-    console.log('🚀 ~ file: index.js ~ line 40 ~ parseImports ~ e', code);
-    throw new Error(e);
-  }
-
-  const ignoreImportRegex = new RegExp(ignoreImport);
-
-  const importsData = {};
-  visit(ast.program.body, {
-    visitImportDeclaration(path) {
-      const source = path.node.source.value;
-
-      if (ignoreImport && ignoreImportRegex.test(source)) {
-        return false;
-      }
-
-      importsData[source] = {default: false, imports: []};
-
-      if (path.node.specifiers.length === 0) {
-        importsData[source].default = true;
-      }
-
-      path.node.specifiers.forEach((specifier) => {
-        if (specifier.type === 'ImportDefaultSpecifier') {
-          importsData[source].default = true;
-        } else {
-          importsData[source].imports.push(specifier.imported?.name);
-        }
-      });
-      this.traverse(path);
-    },
-  });
-
-  return importsData;
 };
 
 const addImports = (result, imports) => {

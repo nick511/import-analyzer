@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const yargs = require('yargs');
 
-const importAnalyzer = require('../index');
+const importAnalyzer = require('../src/index');
 
 const options = yargs
   .usage(
