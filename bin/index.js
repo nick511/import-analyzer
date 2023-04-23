@@ -1,25 +1,50 @@
 #!/usr/bin/env node
 const yargs = require('yargs');
+const path = require('path');
 
-const importAnalyzer = require('../src/index');
+const {importAnalyzer} = require('../dist/index');
 
 const options = yargs
   .usage(
-    `Usage: import-analyzer -p <pattern> -i <ignoreImport>
-    Example: import-analyzer -p 'tests/fixtures/**/*.{js,jsx,ts,tsx}' -i '^@root/.*'
-    `
+    `Usage: import-analyzer -p <path> -r <removeImports>
+    Example: import-analyzer -p src/subdir -r '^@root/.*'`
   )
   .option('p', {
-    alias: 'pattern',
-    describe: 'file pattern to analyze',
+    alias: 'path',
+    describe: 'file path to analyze (default to current working directory)',
+    default: path.resolve(process.cwd()),
     type: 'string',
-    demandOption: true,
   })
   .option('i', {
-    alias: 'ignoreImport',
-    describe: 'ignore import pattern',
+    alias: 'ignorePaths',
+    describe: 'ignore paths',
+    default: ['**/node_modules/**'],
+    type: 'array',
+  })
+  .option('gitIgnoreFile', {
+    describe: '.gitIgnore file path',
     type: 'string',
-    demandOption: false,
+  })
+  .option('r', {
+    alias: 'removeImports',
+    describe: 'filter out import result by regular expression',
+    type: 'string',
+  })
+  .option('g', {
+    alias: 'generateCsv',
+    describe: 'generate CSV file',
+    type: 'boolean',
+  })
+  .option('v', {
+    alias: 'verbose',
+    describe: 'print analyze result',
+    type: 'boolean',
   }).argv;
 
-importAnalyzer(options.pattern, {ignoreImport: options.ignoreImport || null});
+importAnalyzer(options.path, {
+  ignorePaths: options.ignorePaths,
+  gitIgnoreFile: options.gitIgnoreFile,
+  importIgnoreRegExp: options.removeImports || null,
+  generateCsv: options.generateCsv,
+  verbose: options.verbose,
+});
