@@ -1,7 +1,7 @@
 import {parse} from '@babel/parser';
 import {visit} from 'ast-types';
 
-const parseImports = (code, ignoreImport = null) => {
+const parseImports = (code: string, ignoreImport?: string) => {
   let ast = null;
   try {
     ast = parse(code, {
@@ -16,7 +16,7 @@ const parseImports = (code, ignoreImport = null) => {
     return null;
   }
 
-  const ignoreImportRegex = new RegExp(ignoreImport);
+  const ignoreImportRegex = ignoreImport ? new RegExp(ignoreImport) : null;
 
   const importsData = {};
 
@@ -24,7 +24,7 @@ const parseImports = (code, ignoreImport = null) => {
     visitImportDeclaration(path) {
       const source = path.node.source.value;
 
-      if (ignoreImport && ignoreImportRegex.test(source)) {
+      if (ignoreImportRegex?.test(source)) {
         return false;
       }
 

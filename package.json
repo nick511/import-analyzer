@@ -14,6 +14,8 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.21.2",
+    "@babel/preset-env": "^7.21.4",
+    "@babel/preset-typescript": "^7.21.4",
     "@types/jest": "^29.5.1",
     "jest": "^27.5.1"
   },
